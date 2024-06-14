@@ -34,7 +34,10 @@ class UserSettingsController(private val service: UserSettingService) {
     @PostMapping
     fun createUserSetting(
         @RequestBody userSetting: UserSetting,
-    ): UserSetting = service.save(userSetting)
+    ): ResponseEntity<UserSetting> {
+        val savedUserSetting = service.save(userSetting)
+        return ResponseEntity(savedUserSetting, HttpStatus.CREATED)
+    }
 
     @PutMapping("/{id}")
     fun updateUserSettings(
