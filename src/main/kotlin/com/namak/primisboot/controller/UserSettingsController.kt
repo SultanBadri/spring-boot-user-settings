@@ -44,8 +44,15 @@ class UserSettingsController(private val service: UserSettingService) {
         @PathVariable id: Long,
         @RequestBody userSettings: UserSetting,
     ): ResponseEntity<UserSetting> {
-        return if (service.findById(id) != null) {
-            ResponseEntity.ok(service.save(userSettings))
+        val existingUserSetting = service.findById(id)
+        return if (existingUserSetting != null) {
+            val updatedUserSetting =
+                existingUserSetting.copy(
+                    username = userSettings.username,
+                    email = userSettings.email ?: existingUserSetting.email,
+                    notificationsEnabled = userSettings.notificationsEnabled ?: existingUserSetting.notificationsEnabled,
+                )
+            ResponseEntity.ok(service.save(updatedUserSetting))
         } else {
             ResponseEntity(HttpStatus.NOT_FOUND)
         }
