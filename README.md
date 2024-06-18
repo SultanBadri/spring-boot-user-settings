@@ -28,9 +28,9 @@ POSTGRES_USER=your_username
 POSTGRES_PASSWORD=your_password
 ```
 
-Build the application JAR without tests:
+Build the application JAR:
 ```
-./gradlew build -x test
+./gradlew build
 ```
 
 Build and start the application with Docker Compose:
