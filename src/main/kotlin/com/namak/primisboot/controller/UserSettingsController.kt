@@ -1,11 +1,13 @@
 package com.namak.primisboot.controller
 
+import com.namak.primisboot.dto.UserSettingUpdateDto
 import com.namak.primisboot.model.UserSetting
 import com.namak.primisboot.service.UserSettingService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -42,20 +44,43 @@ class UserSettingsController(private val service: UserSettingService) {
     @PutMapping("/{id}")
     fun updateUserSettings(
         @PathVariable id: Long,
-        @RequestBody userSettings: UserSetting,
+        @RequestBody userSettings: UserSettingUpdateDto,
     ): ResponseEntity<UserSetting> {
-        val existingUserSetting = service.findById(id)
-        return if (existingUserSetting != null) {
-            val updatedUserSetting =
-                existingUserSetting.copy(
-                    username = userSettings.username,
-                    email = userSettings.email ?: existingUserSetting.email,
-                    notificationsEnabled = userSettings.notificationsEnabled ?: existingUserSetting.notificationsEnabled,
-                )
-            ResponseEntity.ok(service.save(updatedUserSetting))
-        } else {
-            ResponseEntity(HttpStatus.NOT_FOUND)
+        val existingUserSetting = service.findById(id) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
+
+        if (userSettings.username.isNullOrBlank() || userSettings.email.isNullOrBlank() || userSettings.notificationsEnabled == null) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
+
+        val updatedUserSetting =
+            existingUserSetting.copy(
+                username = userSettings.username,
+                email = userSettings.email,
+                notificationsEnabled = userSettings.notificationsEnabled,
+            )
+
+        return ResponseEntity.ok(service.save(updatedUserSetting))
+    }
+
+    @PatchMapping("/{id}")
+    fun patchUserSettings(
+        @PathVariable id: Long,
+        @RequestBody userSettings: UserSettingUpdateDto,
+    ): ResponseEntity<UserSetting> {
+        val existingUserSetting = service.findById(id) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
+
+        if (userSettings.username.isNullOrBlank() && userSettings.email.isNullOrBlank() && userSettings.notificationsEnabled == null) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+
+        val updatedUserSetting =
+            existingUserSetting.copy(
+                username = userSettings.username ?: existingUserSetting.username,
+                email = userSettings.email ?: existingUserSetting.email,
+                notificationsEnabled = userSettings.notificationsEnabled ?: existingUserSetting.notificationsEnabled,
+            )
+
+        return ResponseEntity.ok(service.save(updatedUserSetting))
     }
 
     @DeleteMapping("/{id}")

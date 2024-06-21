@@ -13,6 +13,6 @@ data class UserSetting(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
     val username: String,
-    val email: String?,
+    val email: String,
     val notificationsEnabled: Boolean? = false,
 )
