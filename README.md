@@ -39,3 +39,9 @@ docker-compose up --build
 ```
 
 The application will be running on http://localhost:8080.
+
+## OpenAPI Documentation
+
+This project includes OpenAPI documentation for the available RESTful APIs. Once the application is running, you can access the API documentation at http://localhost:8080/swagger-ui.html.
+
+The OpenAPI documentation provides a user-friendly interface to interact with the API endpoints and view detailed information about request and response formats.

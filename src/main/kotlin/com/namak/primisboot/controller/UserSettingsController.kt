@@ -3,6 +3,9 @@ package com.namak.primisboot.controller
 import com.namak.primisboot.dto.UserSettingUpdateDto
 import com.namak.primisboot.model.UserSetting
 import com.namak.primisboot.service.UserSettingService
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.tags.Tag
+// import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -17,11 +20,14 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/user-settings")
+@Tag(name = "User Settings", description = "API for managing user settings")
 class UserSettingsController(private val service: UserSettingService) {
     @GetMapping
+    @Operation(summary = "Get all user settings", description = "Retrieve all user settings from the database")
     fun getAllUserSettings(): List<UserSetting> = service.findAll()
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get user settings by ID", description = "Retrieve a specific user setting by ID")
     fun getUserSettingsById(
         @PathVariable id: Long,
     ): ResponseEntity<UserSetting> {
@@ -34,6 +40,7 @@ class UserSettingsController(private val service: UserSettingService) {
     }
 
     @PostMapping
+    @Operation(summary = "Create new user setting", description = "Create a new user setting")
     fun createUserSetting(
         @RequestBody userSetting: UserSetting,
     ): ResponseEntity<UserSetting> {
@@ -42,6 +49,7 @@ class UserSettingsController(private val service: UserSettingService) {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update user settings", description = "Update an existing user setting by ID")
     fun updateUserSettings(
         @PathVariable id: Long,
         @RequestBody userSettings: UserSettingUpdateDto,
@@ -63,6 +71,7 @@ class UserSettingsController(private val service: UserSettingService) {
     }
 
     @PatchMapping("/{id}")
+    @Operation(summary = "Partially update user settings", description = "Partially update an existing user setting by ID")
     fun patchUserSettings(
         @PathVariable id: Long,
         @RequestBody userSettings: UserSettingUpdateDto,
@@ -84,6 +93,7 @@ class UserSettingsController(private val service: UserSettingService) {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete user settings", description = "Delete an existing user setting by ID")
     fun deleteUserSettings(
         @PathVariable id: Long,
     ): ResponseEntity<Void> {
