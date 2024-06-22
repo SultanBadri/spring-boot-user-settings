@@ -5,9 +5,10 @@ import com.namak.primisboot.model.UserSetting
 import com.namak.primisboot.service.UserSettingService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-// import jakarta.validation.Valid
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/user-settings")
+@Validated
 @Tag(name = "User Settings", description = "API for managing user settings")
 class UserSettingsController(private val service: UserSettingService) {
     @GetMapping
@@ -31,18 +33,14 @@ class UserSettingsController(private val service: UserSettingService) {
     fun getUserSettingsById(
         @PathVariable id: Long,
     ): ResponseEntity<UserSetting> {
-        val userSetting = service.findById(id)
-        return if (userSetting != null) {
-            ResponseEntity.ok(userSetting)
-        } else {
-            ResponseEntity(HttpStatus.NOT_FOUND)
-        }
+        val userSetting = service.findById(id) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
+        return ResponseEntity.ok(userSetting)
     }
 
     @PostMapping
     @Operation(summary = "Create new user setting", description = "Create a new user setting")
     fun createUserSetting(
-        @RequestBody userSetting: UserSetting,
+        @RequestBody @Valid userSetting: UserSetting,
     ): ResponseEntity<UserSetting> {
         val savedUserSetting = service.save(userSetting)
         return ResponseEntity(savedUserSetting, HttpStatus.CREATED)
@@ -82,6 +80,10 @@ class UserSettingsController(private val service: UserSettingService) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
 
+        if (userSettings.username?.isBlank() == true || userSettings.email?.isBlank() == true) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+
         val updatedUserSetting =
             existingUserSetting.copy(
                 username = userSettings.username ?: existingUserSetting.username,
@@ -97,11 +99,8 @@ class UserSettingsController(private val service: UserSettingService) {
     fun deleteUserSettings(
         @PathVariable id: Long,
     ): ResponseEntity<Void> {
-        return if (service.findById(id) != null) {
-            service.deleteById(id)
-            ResponseEntity(HttpStatus.NO_CONTENT)
-        } else {
-            ResponseEntity(HttpStatus.NOT_FOUND)
-        }
+        service.findById(id) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
+        service.deleteById(id)
+        return ResponseEntity(HttpStatus.NO_CONTENT)
     }
 }
